@@ -360,7 +360,7 @@ def start(
         if detach:
             cmd.append("--detach")
         if swarm:
-            cmd = ["docker stack deploy -c docker-compose.yml prefect"]
+            cmd = ["docker", "stack", "deploy", "-c", "docker-compose.yml", "prefect"]
         proc = subprocess.Popen(cmd, cwd=compose_dir_path, env=env)
         started = False
         with prefect.utilities.configuration.set_temporary_config(
