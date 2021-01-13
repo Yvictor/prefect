@@ -130,6 +130,13 @@ def server():
     hidden=True,
 )
 @click.option(
+    "--swarm",
+    "-sm",
+    help="Swarm mode. Runs Server in the Swarm Mode",
+    is_flag=True,
+    hidden=True,
+)
+@click.option(
     "--postgres-port",
     help="The port used to serve Postgres",
     default=config.server.database.host_port,
@@ -211,6 +218,7 @@ def start(
     no_upgrade,
     no_ui,
     detach,
+    swarm,
     postgres_port,
     hasura_port,
     graphql_port,
@@ -240,6 +248,7 @@ def start(
                                     database spins up
         --no-ui, -u                 Flag to avoid starting the UI
         --detach, -d                Detached mode. Runs Server containers in the background
+        --swarm, -sm                Swarm Mode
 
     \b
         --postgres-port     TEXT    Port used to serve Postgres, defaults to '5432'
@@ -350,6 +359,8 @@ def start(
         cmd = ["docker-compose", "up"]
         if detach:
             cmd.append("--detach")
+        if swarm:
+            cmd = ["docker stack deploy -c docker-compose.yml prefect"]
         proc = subprocess.Popen(cmd, cwd=compose_dir_path, env=env)
         started = False
         with prefect.utilities.configuration.set_temporary_config(
@@ -372,6 +383,8 @@ def start(
                     time.sleep(0.5)
                     pass
             if detach:
+                return
+            if swarm:
                 return
             while True:
                 time.sleep(0.5)
